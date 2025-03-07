@@ -1,8 +1,18 @@
 import mongoose from "mongoose";
 
-const conversationSchema = new mongoose.Schema({
+interface IConversation {
+  participants: mongoose.Types.ObjectId[];
+  message: mongoose.Types.ObjectId[];
+}
+
+const conversationSchema = new mongoose.Schema<IConversation>({
   participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   message: [{ type: mongoose.Schema.Types.ObjectId, ref: "Message" }],
 });
 
-export const Conversation = mongoose.model("Conversation", conversationSchema);
+const Conversation = mongoose.model<IConversation>(
+  "Conversation",
+  conversationSchema
+);
+
+export default Conversation;

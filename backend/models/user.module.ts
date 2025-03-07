@@ -1,6 +1,21 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema(
+interface IUser {
+  username: string;
+  email: string;
+  password: string;
+  profilePicture?: string;
+  bio?: string;
+  gender?: "male" | "female";
+  followers: mongoose.Types.ObjectId[];
+  following: mongoose.Types.ObjectId[];
+  posts: mongoose.Types.ObjectId[];
+  savedPosts: mongoose.Types.ObjectId[];
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+const userSchema = new mongoose.Schema<IUser>(
   {
     username: { type: String, required: true, unique: true },
     email: { type: String, required: true, unique: true },
@@ -16,4 +31,6 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export const User = mongoose.model("User", userSchema);
+const User = mongoose.model<IUser>("User", userSchema);
+
+export default User;
