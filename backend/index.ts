@@ -1,4 +1,4 @@
-import express, { urlencoded } from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
@@ -6,18 +6,16 @@ import connectDB from "./utils/db.js";
 dotenv.config({});
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT: number = parseInt(process.env.PORT || "3000", 10);
 
-app.get("/", (req, res) => {
-  return res
-    .status(200)
-    .json({ message: "I'm coming from backend.", success: true });
+app.get("/", (req: Request, res: Response) => {
+  res.status(200).json({ message: "I'm coming from backend.", success: true });
 });
 
 // middlewares
 app.use(express.json());
 app.use(cookieParser());
-app.use(urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 const corsOptions = {
   origin: "http://localhost:5173",
