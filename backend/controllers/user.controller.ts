@@ -11,48 +11,49 @@ interface CustomRequest extends Request {
   id?: string;
 }
 
-export const Register = async (req: Request, res: Response) => {
+export const Register = async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, email, password } = req.body as Record<string, string>;
 
     if (!username || !email || !password) {
-      return res
+      res
         .status(401)
         .json({ message: "All fields are required", success: false });
+      return;
     }
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res
-        .status(401)
-        .json({ message: "Email already exists", success: false });
+      res.status(401).json({ message: "Email already exists", success: false });
+      return;
     }
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await User.create({ username, email, password: hashedPassword });
-    return res
+    res
       .status(201)
       .json({ message: "Account created successfully", success: true });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error", success: false });
+    res.status(500).json({ message: "Internal server error", success: false });
+    return;
   }
 };
 
-export const Login = async (req: Request, res: Response) => {
+export const Login = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body as Record<string, string>;
     if (!email || !password) {
-      return res
+      res
         .status(401)
         .json({ message: "All fields are required", success: false });
+      return;
     }
     let user = await User.findOne({ email });
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res
+      res
         .status(401)
         .json({ message: "Invalid credentials entered", success: false });
+      return;
     }
 
     const userData = {
@@ -67,16 +68,17 @@ export const Login = async (req: Request, res: Response) => {
     };
 
     if (!process.env.SECRET_KEY) {
-      return res.status(500).json({
+      res.status(500).json({
         message: "Server error: Secret key not found",
         success: false,
       });
+      return;
     }
 
     const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
       expiresIn: "1d",
     });
-    return res
+    res
       .cookie("token", token, {
         httpOnly: true,
         sameSite: "strict",
@@ -89,43 +91,45 @@ export const Login = async (req: Request, res: Response) => {
       });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error", success: false });
+    res.status(500).json({ message: "Internal server error", success: false });
+    return;
   }
 };
 
-export const Logout = async (req: Request, res: Response) => {
+export const Logout = async (req: Request, res: Response): Promise<void> => {
   try {
-    return res
+    res
       .cookie("token", "", { maxAge: 0 })
       .json({ message: "Logged out successfully", success: true });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error", success: false });
+    res.status(500).json({ message: "Internal server error", success: false });
+    return;
   }
 };
 
-export const getProfile = async (req: Request, res: Response) => {
+export const getProfile = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id).select("-password");
     if (!user) {
-      return res
-        .status(401)
-        .json({ message: "User not found", success: false });
+      res.status(401).json({ message: "User not found", success: false });
+      return;
     }
-    return res.status(201).json({ user, success: true });
+    res.status(200).json({ user, success: true });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error", success: false });
+    res.status(500).json({ message: "Internal server error", success: false });
+    return;
   }
 };
 
-export const editProfile = async (req: CustomRequest, res: Response) => {
+export const editProfile = async (
+  req: CustomRequest,
+  res: Response
+): Promise<void> => {
   try {
     const userId = req.id;
     const { bio, gender }: { bio?: string; gender?: "male" | "female" } =
@@ -139,11 +143,10 @@ export const editProfile = async (req: CustomRequest, res: Response) => {
       cloudResponse = await cloudinary.uploader.upload(fileUri as string);
     }
 
-    const user = await User.findById(userId);
+    const user = await User.findById(userId).select("-password");
     if (!user) {
-      return res
-        .status(404)
-        .json({ message: "User not found", success: false });
+      res.status(404).json({ message: "User not found", success: false });
+      return;
     }
 
     if (bio) user.bio = bio;
@@ -151,52 +154,55 @@ export const editProfile = async (req: CustomRequest, res: Response) => {
     if (profilePicture) user.profilePicture = cloudResponse?.secure_url;
 
     await user.save();
-    return res
+    res
       .status(200)
       .json({ message: "Profile updated successfully", success: true, user });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error", success: false });
+    res.status(500).json({ message: "Internal server error", success: false });
+    return;
   }
 };
 
-export const getSuggestedUsers = async (req: CustomRequest, res: Response) => {
+export const getSuggestedUsers = async (
+  req: CustomRequest,
+  res: Response
+): Promise<void> => {
   try {
     const suggestedUsers = await User.find({ _id: { $ne: req.id } }).select(
       "-password"
     );
     if (!suggestedUsers) {
-      return res
-        .status(400)
-        .json({ message: "No users found", success: false });
+      res.status(400).json({ message: "No users found", success: false });
+      return;
     }
-    return res.status(200).json({ users: suggestedUsers, success: true });
+    res.status(200).json({ users: suggestedUsers, success: true });
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error", success: false });
+    res.status(500).json({ message: "Internal server error", success: false });
+    return;
   }
 };
 
-export const followOrUnfollow = async (req: CustomRequest, res: Response) => {
+export const followOrUnfollow = async (
+  req: CustomRequest,
+  res: Response
+): Promise<void> => {
   try {
     const followKarneWala = req.id; // logged in user
     const jiskoFollowKarunga = req.params.id; // user to follow
     if (followKarneWala === jiskoFollowKarunga) {
-      return res
+      res
         .status(400)
         .json({ message: "You cannot follow yourself", success: false });
+      return;
     }
     const user = await User.findById(followKarneWala);
     const targetUser = await User.findById(jiskoFollowKarunga);
 
     if (!user || !targetUser) {
-      return res
-        .status(400)
-        .json({ message: "User not found", success: false });
+      res.status(400).json({ message: "User not found", success: false });
+      return;
     }
     // Checking whether to follow or unfollow
     const isFollowing = user.following.includes(
@@ -214,7 +220,7 @@ export const followOrUnfollow = async (req: CustomRequest, res: Response) => {
           { $pull: { followers: followKarneWala } }
         ),
       ]);
-      return res
+      res
         .status(200)
         .json({ message: "Unfollowed successfully", success: true });
     } else {
@@ -229,14 +235,11 @@ export const followOrUnfollow = async (req: CustomRequest, res: Response) => {
           { $push: { followers: followKarneWala } }
         ),
       ]);
-      return res
-        .status(200)
-        .json({ message: "Followed successfully", success: true });
+      res.status(200).json({ message: "Followed successfully", success: true });
     }
   } catch (error) {
     console.log(error);
-    return res
-      .status(500)
-      .json({ message: "Internal server error", success: false });
+    res.status(500).json({ message: "Internal server error", success: false });
+    return;
   }
 };
