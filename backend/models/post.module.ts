@@ -6,15 +6,24 @@ interface IPost {
   author: mongoose.Types.ObjectId;
   likes: mongoose.Types.ObjectId[];
   comments: mongoose.Types.ObjectId[];
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-const postSchema = new mongoose.Schema<IPost>({
-  caption: { type: String, default: "" },
-  image: { type: String, required: true },
-  author: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
-  comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
-});
+const postSchema = new mongoose.Schema<IPost>(
+  {
+    caption: { type: String, default: "" },
+    image: { type: String, required: true },
+    author: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
+  },
+  { timestamps: true }
+);
 
 const Post = mongoose.model<IPost>("Post", postSchema);
 
