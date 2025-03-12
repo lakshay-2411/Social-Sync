@@ -210,3 +210,106 @@ export const addComment = async (req: CustomRequest, res: Response) => {
     return;
   }
 };
+
+export const getCommentsOfPost = async (req: Request, res: Response) => {
+  try {
+    const postId = req.params.id;
+
+    const comments = await Comment.find({ post: postId }).populate({
+      path: "author",
+      select: "username profilePicture",
+    });
+
+    if (comments.length === 0) {
+      res
+        .status(404)
+        .json({ message: "No comments found for this post", success: false });
+      return;
+    }
+
+    res.status(200).json({ comments, success: true });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error", success: false });
+    return;
+  }
+};
+
+export const deletePost = async (req: CustomRequest, res: Response) => {
+  try {
+    const postId = req.params.id;
+    const authorId = req.id;
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      res.status(404).json({ message: "Post not found", success: false });
+      return;
+    }
+
+    // check if the logged in user is the author of the post
+    if (post.author.toString() !== authorId) {
+      res.status(403).json({
+        message: "You are not authorized to delete this post",
+        success: false,
+      });
+    }
+
+    // Delete the post
+    await Post.findByIdAndDelete(postId);
+
+    // Delete the post from the user's post array
+    let user = await User.findById(authorId);
+    if (user) {
+      user.posts = user.posts.filter((post) => post.toString() !== postId);
+      await user.save();
+    }
+
+    // Delete all comments of the post
+    await Comment.deleteMany({ post: postId });
+
+    res.status(200).json({ message: "Post deleted", success: true });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error", success: false });
+    return;
+  }
+};
+
+export const savedPost = async (req: CustomRequest, res: Response) => {
+  try {
+    const postId = req.params.id;
+    const authorId = req.id;
+
+    const post = await Post.findById(postId);
+    if (!post) {
+      res.status(404).json({ message: "Post not found", success: false });
+      return;
+    }
+
+    const user = await User.findById(authorId);
+    if (!user) {
+      res.status(404).json({ message: "User not found", success: false });
+      return;
+    }
+
+    // Save the post to the user's saved post array
+    if (user.savedPosts.includes(post._id)) {
+      // Already saved. So remove it
+      await user.updateOne({ $pull: { savedPosts: post._id } });
+      await user.save();
+      res
+        .status(200)
+        .json({ type: "unsaved", message: "Post unsaved", success: true });
+    } else {
+      await user.updateOne({ $addToSet: { savedPosts: post._id } });
+      await user.save();
+      res
+        .status(200)
+        .json({ type: "saved", message: "Post saved", success: true });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error", success: false });
+    return;
+  }
+};
