@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import getDataUri from "../utils/datauri.js";
 import cloudinary from "../utils/cloudinary.js";
 import mongoose from "mongoose";
+import Post from "../models/post.module.js";
 
 interface CustomRequest extends Request {
   file?: Express.Multer.File;
@@ -56,6 +57,27 @@ export const Login = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
+    if (!process.env.SECRET_KEY) {
+      res.status(500).json({
+        message: "Server error: Secret key not found",
+        success: false,
+      });
+      return;
+    }
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
+      expiresIn: "1d",
+    });
+
+    // populate each postId in the post array
+    const populatedPost = await Promise.all(
+      user.posts.map(async (postId) => {
+        const post = await Post.findById(postId);
+        if (post?.author.equals(user._id)) {
+          return post;
+        }
+        return null;
+      })
+    );
     const userData = {
       _id: user._id,
       username: user.username,
@@ -64,20 +86,9 @@ export const Login = async (req: Request, res: Response): Promise<void> => {
       bio: user.bio,
       followers: user.followers,
       following: user.following,
-      posts: user.posts,
+      posts: populatedPost,
     };
 
-    if (!process.env.SECRET_KEY) {
-      res.status(500).json({
-        message: "Server error: Secret key not found",
-        success: false,
-      });
-      return;
-    }
-
-    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, {
-      expiresIn: "1d",
-    });
     res
       .cookie("token", token, {
         httpOnly: true,
