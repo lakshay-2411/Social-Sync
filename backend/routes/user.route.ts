@@ -31,15 +31,5 @@ router
 
 router.route("/suggested").get(isAuthenticated, getSuggestedUsers);
 router.route("/followorunfollow/:id").post(isAuthenticated, followOrUnfollow);
-router
-  .route("/addnewpost")
-  .post(isAuthenticated, upload.single("image"), addNewPost);
-
-router.route("/getallposts").get(getAllPosts);
-router.route("/addcomment/:id").post(isAuthenticated, addComment);
-router.route("/getuserpost").get(isAuthenticated, getUserPost);
-
-router.route("/likepost/:id").post(isAuthenticated, likePost);
-router.route("/unlikepost/:id").post(isAuthenticated, unlikePost);
 
 export default router;

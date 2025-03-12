@@ -275,7 +275,7 @@ export const deletePost = async (req: CustomRequest, res: Response) => {
   }
 };
 
-export const savedPost = async (req: CustomRequest, res: Response) => {
+export const savePost = async (req: CustomRequest, res: Response) => {
   try {
     const postId = req.params.id;
     const authorId = req.id;
