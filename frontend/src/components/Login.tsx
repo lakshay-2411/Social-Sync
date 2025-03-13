@@ -93,7 +93,7 @@ const Login = () => {
         ) : (
           <Button type="submit">Login</Button>
         )}
-        <span className="text-center">
+        <span className="flex gap-1 items-center justify-center">
           Don't have an account?
           <Link className="text-blue-600" to="/signup">
             Signup

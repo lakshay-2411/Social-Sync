@@ -105,7 +105,7 @@ const Signup = () => {
         ) : (
           <Button type="submit">Signup</Button>
         )}
-        <span className="text-center">
+        <span className="flex gap-1 items-center justify-center">
           Already have an account?
           <Link className="text-blue-600" to="/login">
             Login
