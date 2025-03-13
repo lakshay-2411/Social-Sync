@@ -61,14 +61,14 @@ const LeftSideBar = () => {
   return (
     <div className="fixed top-0 z-10 left-0 px-4 border-r border-gray-300 w-[16%] h-screen">
       <div className="flex flex-col">
-        <h1>LOGO</h1>
+        <h1 className="my-4 pl-3 font-bold text-xl">LOGO</h1>
         <div>
           {sidebarItems.map((item, index) => {
             return (
               <div
                 onClick={() => sidebarHandler(item.text)}
                 key={index}
-                className="flex items-center space-x-2 relative hover:bg-gray-100 cursor-pointer rounder-lg p-3 my-3"
+                className="flex items-center space-x-2 relative text-sm hover:bg-gray-100 cursor-pointer rounder-lg p-3 my-2"
               >
                 {item.icon}
                 <span>{item.text}</span>

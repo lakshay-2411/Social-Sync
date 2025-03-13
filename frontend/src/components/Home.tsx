@@ -1,7 +1,15 @@
+import { Outlet } from "react-router-dom";
+import Feed from "./Feed";
+import RightSidebar from "./RightSidebar";
+
 const Home = () => {
   return (
-    <div>
-      <h1>Home</h1>
+    <div className="flex ">
+      <div className="grow">
+        <Feed />
+        <Outlet />
+      </div>
+      <RightSidebar />
     </div>
   );
 };
