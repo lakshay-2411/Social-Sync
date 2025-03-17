@@ -9,6 +9,8 @@ import React, { useState } from "react";
 const Post = () => {
   const [text, setText] = useState("");
 
+  const [showDialog, setShowDialog] = useState(false);
+
   const handleComment = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputText = e.target.value;
     if (inputText.trim()) {
@@ -58,18 +60,23 @@ const Post = () => {
             className="cursor-pointer hover:text-gray-600"
             size={"22px"}
           />
-          <MessageCircle className="cursor-pointer hover:text-gray-600" />
+          <MessageCircle
+            className="cursor-pointer hover:text-gray-600"
+            onClick={() => setShowDialog(true)}
+          />
           <Send className="cursor-pointer hover:text-gray-600" />
         </div>
         <Bookmark className="cursor-pointer hover:text-gray-600" />
       </div>
-      <span className="font-medium block mb-2">200 likes</span>
-      <p>
+      <span className="font-medium text-sm block mb-2">200 likes</span>
+      <p className="text-sm">
         <span className="font-medium mr-2">Username</span>
         Caption
       </p>
-      <span>View all 10 comments</span>
-      <CommentDialog />
+      <span className="cursor-pointer text-sm text-gray-600" onClick={() => setShowDialog(true)}>
+        View all 10 comments
+      </span>
+      <CommentDialog showDialog={showDialog} setShowDialog={setShowDialog} />
       <div className="flex items-center justify-between">
         <input
           type="text"
