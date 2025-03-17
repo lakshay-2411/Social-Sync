@@ -3,8 +3,20 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import CommentDialog from "./CommentDialog";
+import React, { useState } from "react";
 
 const Post = () => {
+  const [text, setText] = useState("");
+
+  const handleComment = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputText = e.target.value;
+    if (inputText.trim()) {
+      setText(inputText);
+    } else {
+      setText("");
+    }
+  };
   return (
     <div className="my-8 w-full max-w-sm mx-auto">
       <div className="flex items-center justify-between">
@@ -40,15 +52,33 @@ const Post = () => {
         src="https://images.unsplash.com/photo-1740715537042-6de862cdaab4?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         alt="post_image"
       />
-      <div className="">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <FaRegHeart className="cursor-pointer" size={"22px"} />
-            <MessageCircle className="cursor-pointer hover:text-gray-600" />
-            <Send className="cursor-pointer hover:text-gray-600" />
-          </div>
-          <Bookmark />
+      <div className="flex items-center justify-between my-2">
+        <div className="flex items-center gap-2">
+          <FaRegHeart
+            className="cursor-pointer hover:text-gray-600"
+            size={"22px"}
+          />
+          <MessageCircle className="cursor-pointer hover:text-gray-600" />
+          <Send className="cursor-pointer hover:text-gray-600" />
         </div>
+        <Bookmark className="cursor-pointer hover:text-gray-600" />
+      </div>
+      <span className="font-medium block mb-2">200 likes</span>
+      <p>
+        <span className="font-medium mr-2">Username</span>
+        Caption
+      </p>
+      <span>View all 10 comments</span>
+      <CommentDialog />
+      <div className="flex items-center justify-between">
+        <input
+          type="text"
+          placeholder="Add comment..."
+          value={text}
+          onChange={handleComment}
+          className="outline-none text-sm w-full"
+        />
+        {text && <span className="text-[#3BADF8]">Post</span>}
       </div>
     </div>
   );
