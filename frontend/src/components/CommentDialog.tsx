@@ -20,6 +20,10 @@ const CommentDialog: React.FC<{
     }
   };
 
+  const postCommentHandler = async () => {
+    alert(comment);
+  };
+
   return (
     <Dialog open={showDialog}>
       <DialogContent
@@ -76,7 +80,13 @@ const CommentDialog: React.FC<{
                   onChange={handleComment}
                   className="w-full outline-none border border-gray-300 p-2 rounded"
                 />
-                <Button variant="outline">Send</Button>
+                <Button
+                  disabled={!comment.trim()}
+                  onClick={postCommentHandler}
+                  variant="outline"
+                >
+                  Send
+                </Button>
               </div>
             </div>
           </div>
