@@ -11,12 +11,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { toast } from "sonner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
+import { setAuthUser } from "@/redux/authSlice";
 
 const LeftSideBar = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch();
 
   const logoutHandler = async () => {
     try {
@@ -24,6 +26,7 @@ const LeftSideBar = () => {
         withCredentials: true,
       });
       if (res.data.success) {
+        dispatch(setAuthUser(null));
         toast.success(res.data.message);
         navigate("/login");
       }
