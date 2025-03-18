@@ -1,9 +1,5 @@
 import mongoose from "mongoose";
-
-interface IConversation {
-  participants: mongoose.Types.ObjectId[];
-  messages: mongoose.Types.ObjectId[];
-}
+import IConversation from "../interfaces/conversationInterface.js";
 
 const conversationSchema = new mongoose.Schema<IConversation>({
   participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],

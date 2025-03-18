@@ -1,14 +1,5 @@
 import mongoose, { mongo } from "mongoose";
-
-interface IPost {
-  caption?: string;
-  image: string;
-  author: mongoose.Types.ObjectId;
-  likes: mongoose.Types.ObjectId[];
-  comments: mongoose.Types.ObjectId[];
-  createdAt?: Date;
-  updatedAt?: Date;
-}
+import IPost from "../interfaces/postInterface.js";
 
 const postSchema = new mongoose.Schema<IPost>(
   {
