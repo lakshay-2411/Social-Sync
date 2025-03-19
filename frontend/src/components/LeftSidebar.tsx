@@ -14,11 +14,14 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { setAuthUser } from "@/redux/authSlice";
+import { useState } from "react";
+import CreateDialog from "./CreateDialog";
 
 const LeftSideBar = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch();
+  const [createPostModal, setCreatePostModal] = useState(false);
 
   const logoutHandler = async () => {
     try {
@@ -43,6 +46,8 @@ const LeftSideBar = () => {
   const sidebarHandler = (textType: string) => {
     if (textType === "Logout") {
       logoutHandler();
+    } else if (textType === "Create") {
+      setCreatePostModal(true);
     }
   };
 
@@ -84,6 +89,10 @@ const LeftSideBar = () => {
           })}
         </div>
       </div>
+      <CreateDialog
+        createPostModal={createPostModal}
+        setCreatePostModal={setCreatePostModal}
+      />
     </div>
   );
 };
