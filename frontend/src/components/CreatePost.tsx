@@ -7,8 +7,12 @@ import { readFileAsDataURL } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { setPost } from "@/redux/postSlice";
+import IPostFrontend from "@/interfaces/postInterface";
 
-const CreateDialog: React.FC<{
+const CreatePost: React.FC<{
   createPostModal: boolean;
   setCreatePostModal: (value: boolean) => void;
 }> = ({ createPostModal, setCreatePostModal }) => {
@@ -17,6 +21,9 @@ const CreateDialog: React.FC<{
   const [caption, setCaption] = useState("");
   const [imagePreview, setImagePreview] = useState<string | null>("");
   const [loading, setLoading] = useState(false);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const posts: IPostFrontend[] = useSelector((state: any) => state.post.posts);
+  const dispatch = useDispatch();
 
   const fileHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -46,7 +53,9 @@ const CreateDialog: React.FC<{
         }
       );
       if (res.data.success) {
+        dispatch(setPost([res.data.post, ...posts]));
         toast.success(res.data.message);
+        setCreatePostModal(false);
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
@@ -67,11 +76,11 @@ const CreateDialog: React.FC<{
         </DialogHeader>
         <div className="flex gap-3 items-center">
           <Avatar>
-            <AvatarImage src="" alt="create_post_image" />
+            <AvatarImage src={user?.profilePicture} alt="create_post_image" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div>
-            <h1 className="font-semibold text-xs">Username</h1>
+            <h1 className="font-semibold text-xs">{user?.username}</h1>
           </div>
         </div>
         <Textarea
@@ -121,4 +130,4 @@ const CreateDialog: React.FC<{
   );
 };
 
-export default CreateDialog;
+export default CreatePost;

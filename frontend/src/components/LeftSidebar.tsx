@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { setAuthUser } from "@/redux/authSlice";
 import { useState } from "react";
-import CreateDialog from "./CreateDialog";
+import CreatePost from "./CreatePost";
 
 const LeftSideBar = () => {
   const navigate = useNavigate();
@@ -89,7 +89,7 @@ const LeftSideBar = () => {
           })}
         </div>
       </div>
-      <CreateDialog
+      <CreatePost
         createPostModal={createPostModal}
         setCreatePostModal={setCreatePostModal}
       />

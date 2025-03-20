@@ -5,8 +5,13 @@ import { Button } from "./ui/button";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import CommentDialog from "./CommentDialog";
 import React, { useState } from "react";
+import IPostFrontend from "@/interfaces/postInterface";
 
-const Post = () => {
+interface PostProps {
+  post: IPostFrontend;
+}
+
+const Post: React.FC<PostProps> = ({ post }) => {
   const [text, setText] = useState("");
 
   const [showDialog, setShowDialog] = useState(false);
@@ -24,10 +29,10 @@ const Post = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Avatar>
-            <AvatarImage src="" alt="post_image" />
+            <AvatarImage src={post.author?.profilePicture} alt="post_image" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
-          <h1>Username</h1>
+          <h1>{post.author?.username}</h1>
         </div>
         <Dialog>
           <DialogTrigger asChild>
@@ -51,7 +56,7 @@ const Post = () => {
       </div>
       <img
         className="rounded-sm my-2 w-full aspect-square object-cover"
-        src="https://images.unsplash.com/photo-1740715537042-6de862cdaab4?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        src={post.image}
         alt="post_image"
       />
       <div className="flex items-center justify-between my-2">
@@ -68,13 +73,18 @@ const Post = () => {
         </div>
         <Bookmark className="cursor-pointer hover:text-gray-600" />
       </div>
-      <span className="font-medium text-sm block mb-2">200 likes</span>
+      <span className="font-medium text-sm block mb-2">
+        {post.likes.length} likes
+      </span>
       <p className="text-sm">
-        <span className="font-medium mr-2">Username</span>
-        Caption
+        <span className="font-medium mr-2">{post.author?.username}</span>
+        {post.caption}
       </p>
-      <span className="cursor-pointer text-sm text-gray-600" onClick={() => setShowDialog(true)}>
-        View all 10 comments
+      <span
+        className="cursor-pointer text-sm text-gray-600"
+        onClick={() => setShowDialog(true)}
+      >
+        View all {post.comments.length} comments
       </span>
       <CommentDialog showDialog={showDialog} setShowDialog={setShowDialog} />
       <div className="flex items-center justify-between">
