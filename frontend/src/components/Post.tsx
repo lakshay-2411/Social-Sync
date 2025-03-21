@@ -6,6 +6,11 @@ import { FaHeart, FaRegHeart } from "react-icons/fa";
 import CommentDialog from "./CommentDialog";
 import React, { useState } from "react";
 import IPostFrontend from "@/interfaces/postInterface";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { toast } from "sonner";
+import axios from "axios";
+import { setPost } from "@/redux/postSlice";
 
 interface PostProps {
   post: IPostFrontend;
@@ -13,8 +18,14 @@ interface PostProps {
 
 const Post: React.FC<PostProps> = ({ post }) => {
   const [text, setText] = useState("");
-
   const [showDialog, setShowDialog] = useState(false);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const posts: IPostFrontend[] = useSelector((state: any) => state.post.posts);
+  const [isLiked, setIsLiked] = useState(
+    (user && post.likes.includes(user._id.toString())) || false
+  );
+  const [likeCount, setLikeCount] = useState(post.likes.length);
+  const dispatch = useDispatch();
 
   const handleComment = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputText = e.target.value;
@@ -24,6 +35,63 @@ const Post: React.FC<PostProps> = ({ post }) => {
       setText("");
     }
   };
+
+  const likeOrUnlikePostHandler = async () => {
+    try {
+      const action = isLiked ? "unlike" : "like";
+      const res = await axios.get(
+        `http://localhost:8000/api/v1/post/${post._id}/${action}`,
+        { withCredentials: true }
+      );
+      if (res.data.success) {
+        const updatedLikeCount = isLiked ? likeCount - 1 : likeCount + 1;
+        setLikeCount(updatedLikeCount);
+        setIsLiked(!isLiked);
+
+        const updatedPostData = posts.map((postItem) =>
+          postItem._id === post._id
+            ? {
+                ...postItem,
+                likes: isLiked
+                  ? postItem.likes.filter((id) => id !== user?._id.toString())
+                  : [...postItem.likes, user?._id],
+              }
+            : postItem
+        );
+        dispatch(setPost(updatedPostData));
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    }
+  };
+
+  const deletePostHandler = async () => {
+    try {
+      const res = await axios.delete(
+        `http://localhost:8000/api/v1/post/delete/${post?._id}`,
+        { withCredentials: true }
+      );
+      if (res.data.success) {
+        const updatedPostData = posts.filter(
+          (postItem) => postItem?._id !== post?._id
+        );
+        dispatch(setPost(updatedPostData));
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    }
+  };
+
   return (
     <div className="my-8 w-full max-w-sm mx-auto">
       <div className="flex items-center justify-between">
@@ -48,9 +116,15 @@ const Post: React.FC<PostProps> = ({ post }) => {
             <Button variant="ghost" className="cursor-pointer w-fit">
               Add to favourites
             </Button>
-            <Button variant="ghost" className="cursor-pointer w-fit">
-              Delete
-            </Button>
+            {user && user?._id === post?.author._id && (
+              <Button
+                onClick={deletePostHandler}
+                variant="ghost"
+                className="cursor-pointer w-fit"
+              >
+                Delete
+              </Button>
+            )}
           </DialogContent>
         </Dialog>
       </div>
@@ -61,10 +135,19 @@ const Post: React.FC<PostProps> = ({ post }) => {
       />
       <div className="flex items-center justify-between my-2">
         <div className="flex items-center gap-2">
-          <FaRegHeart
-            className="cursor-pointer hover:text-gray-600"
-            size={"22px"}
-          />
+          {isLiked ? (
+            <FaHeart
+              onClick={likeOrUnlikePostHandler}
+              className="cursor-pointer text-red-600"
+              size={"24px"}
+            />
+          ) : (
+            <FaRegHeart
+              onClick={likeOrUnlikePostHandler}
+              className="cursor-pointer hover:text-gray-600"
+              size={"22px"}
+            />
+          )}
           <MessageCircle
             className="cursor-pointer hover:text-gray-600"
             onClick={() => setShowDialog(true)}
@@ -73,9 +156,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
         </div>
         <Bookmark className="cursor-pointer hover:text-gray-600" />
       </div>
-      <span className="font-medium text-sm block mb-2">
-        {post.likes.length} likes
-      </span>
+      <span className="font-medium text-sm block mb-2">{likeCount} likes</span>
       <p className="text-sm">
         <span className="font-medium mr-2">{post.author?.username}</span>
         {post.caption}
