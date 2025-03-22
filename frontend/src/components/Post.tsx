@@ -11,6 +11,7 @@ import { RootState } from "@/redux/store";
 import { toast } from "sonner";
 import axios from "axios";
 import { setPost, setSelectedPost } from "@/redux/postSlice";
+import { Badge } from "./ui/badge";
 
 interface PostProps {
   post: IPostFrontend;
@@ -137,7 +138,12 @@ const Post: React.FC<PostProps> = ({ post }) => {
             <AvatarImage src={post.author?.profilePicture} alt="post_image" />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
-          <h1>{post.author?.username}</h1>
+          <div className="flex items-center gap-3">
+            <h1>{post.author?.username}</h1>
+            {user?._id === post?.author?._id && (
+              <Badge variant={"secondary"}>Author</Badge>
+            )}
+          </div>
         </div>
         <Dialog>
           <DialogTrigger asChild>
@@ -201,15 +207,17 @@ const Post: React.FC<PostProps> = ({ post }) => {
         <span className="font-medium mr-2">{post.author?.username}</span>
         {post.caption}
       </p>
-      <span
-        className="cursor-pointer text-sm text-gray-600"
-        onClick={() => {
-          dispatch(setSelectedPost(post));
-          setShowDialog(true);
-        }}
-      >
-        View all {comment.length} comments
-      </span>
+      {comment.length > 0 && (
+        <span
+          className="cursor-pointer text-sm text-gray-600"
+          onClick={() => {
+            dispatch(setSelectedPost(post));
+            setShowDialog(true);
+          }}
+        >
+          View all {comment.length} comments
+        </span>
+      )}
       <CommentDialog showDialog={showDialog} setShowDialog={setShowDialog} />
       <div className="flex items-center justify-between">
         <input
