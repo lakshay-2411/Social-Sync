@@ -16,6 +16,7 @@ import { RootState } from "@/redux/store";
 import { setAuthUser } from "@/redux/authSlice";
 import { useState } from "react";
 import CreatePost from "./CreatePost";
+import { setPost, setSelectedPost } from "@/redux/postSlice";
 
 const LeftSideBar = () => {
   const navigate = useNavigate();
@@ -30,6 +31,8 @@ const LeftSideBar = () => {
       });
       if (res.data.success) {
         dispatch(setAuthUser(null));
+        dispatch(setSelectedPost(null));
+        dispatch(setPost([]));
         toast.success(res.data.message);
         navigate("/login");
       }
