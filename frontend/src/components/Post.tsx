@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { toast } from "sonner";
 import axios from "axios";
-import { setPost } from "@/redux/postSlice";
+import { setPost, setSelectedPost } from "@/redux/postSlice";
 
 interface PostProps {
   post: IPostFrontend;
@@ -25,6 +25,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
     (user && post.likes.includes(user._id.toString())) || false
   );
   const [likeCount, setLikeCount] = useState(post.likes.length);
+  const [comment, setComment] = useState(post.comments);
   const dispatch = useDispatch();
 
   const handleComment = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,6 +60,42 @@ const Post: React.FC<PostProps> = ({ post }) => {
             : postItem
         );
         dispatch(setPost(updatedPostData));
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    }
+  };
+
+  const postCommentHandler = async () => {
+    try {
+      const res = await axios.post(
+        `http://localhost:8000/api/v1/post/${post._id}/comment`,
+        { text },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      if (res.data.success) {
+        setComment([...comment, res.data.comment]);
+
+        const updatedPostData = posts.map((postItem) =>
+          postItem._id === post._id
+            ? {
+                ...postItem,
+                comments: [...postItem.comments, res.data.comment],
+              }
+            : postItem
+        );
+        dispatch(setPost(updatedPostData));
+        setText("");
         toast.success(res.data.message);
       }
     } catch (error) {
@@ -150,7 +187,10 @@ const Post: React.FC<PostProps> = ({ post }) => {
           )}
           <MessageCircle
             className="cursor-pointer hover:text-gray-600"
-            onClick={() => setShowDialog(true)}
+            onClick={() => {
+              dispatch(setSelectedPost(post));
+              setShowDialog(true);
+            }}
           />
           <Send className="cursor-pointer hover:text-gray-600" />
         </div>
@@ -163,9 +203,12 @@ const Post: React.FC<PostProps> = ({ post }) => {
       </p>
       <span
         className="cursor-pointer text-sm text-gray-600"
-        onClick={() => setShowDialog(true)}
+        onClick={() => {
+          dispatch(setSelectedPost(post));
+          setShowDialog(true);
+        }}
       >
-        View all {post.comments.length} comments
+        View all {comment.length} comments
       </span>
       <CommentDialog showDialog={showDialog} setShowDialog={setShowDialog} />
       <div className="flex items-center justify-between">
@@ -176,7 +219,14 @@ const Post: React.FC<PostProps> = ({ post }) => {
           onChange={handleComment}
           className="outline-none text-sm w-full"
         />
-        {text && <span className="text-[#3BADF8]">Post</span>}
+        {text && (
+          <span
+            onClick={postCommentHandler}
+            className="text-[#3BADF8] cursor-pointer"
+          >
+            Post
+          </span>
+        )}
       </div>
     </div>
   );
