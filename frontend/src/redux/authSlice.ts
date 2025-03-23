@@ -3,10 +3,12 @@ import IUser from "../../../backend/interfaces/userInterface";
 
 interface AuthState {
   user: IUser | null;
+  suggestedUsers: IUser[];
 }
 
 const initialState: AuthState = {
   user: null,
+  suggestedUsers: [],
 };
 
 const authSlice = createSlice({
@@ -16,8 +18,11 @@ const authSlice = createSlice({
     setAuthUser: (state, action: PayloadAction<IUser | null>) => {
       state.user = action.payload;
     },
+    setSuggestedUsers: (state, action: PayloadAction<IUser[]>) => {
+      state.suggestedUsers = action.payload;
+    },
   },
 });
 
-export const { setAuthUser } = authSlice.actions;
+export const { setAuthUser, setSuggestedUsers } = authSlice.actions;
 export default authSlice.reducer;
