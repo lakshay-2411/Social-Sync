@@ -2,19 +2,20 @@ import { useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { RootState } from "@/redux/store";
 import useGetUserProfile from "@/hooks/useGetUserProfile";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { AtSign, Heart, MessageCircle } from "lucide-react";
 import { useState } from "react";
+import SkeletonProfile from "./SkeletonProfile";
 
 const Profile = () => {
   const params = useParams();
-  useGetUserProfile(params.id || "");
+  const loading = useGetUserProfile(params.id || "");
   const [activeTab, setActiveTab] = useState("POSTS");
-  const { userProfile } = useSelector((state: RootState) => state.auth);
+  const { userProfile, user } = useSelector((state: RootState) => state.auth);
 
-  const isLoggedInUserProfile = true;
+  const isLoggedInUserProfile = user?._id === userProfile?._id;
   const isFollowing = false;
 
   const postsToDisplay =
@@ -24,7 +25,7 @@ const Profile = () => {
     setActiveTab(tab);
   };
 
-  return (
+  return loading ? <SkeletonProfile /> : (
     <div className="flex max-w-4xl justify-center mx-auto pl-10">
       <div className="flex flex-col gap-10 p-8">
         <div className="grid grid-cols-2">
@@ -43,12 +44,14 @@ const Profile = () => {
                 <span>{userProfile?.username}</span>
                 {isLoggedInUserProfile ? (
                   <>
-                    <Button
-                      variant={"secondary"}
-                      className="cursor-pointer hover:bg-gray-200 h-8"
-                    >
-                      Edit Profile
-                    </Button>
+                    <Link to="/account/edit">
+                      <Button
+                        variant={"secondary"}
+                        className="cursor-pointer hover:bg-gray-200 h-8"
+                      >
+                        Edit Profile
+                      </Button>
+                    </Link>
                     <Button
                       variant={"secondary"}
                       className="cursor-pointer hover:bg-gray-200 h-8"
