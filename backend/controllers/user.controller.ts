@@ -124,7 +124,9 @@ export const getProfile = async (
   res: Response
 ): Promise<void> => {
   try {
-    const user = await User.findById(req.params.id).select("-password");
+    const user = await User.findById(req.params.id)
+      .populate({ path: "posts", options: { sort: { createdAt: -1 } } })
+      .populate("savedPosts");
     if (!user) {
       res.status(401).json({ message: "User not found", success: false });
       return;
