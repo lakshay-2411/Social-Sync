@@ -86,6 +86,7 @@ export const Login = async (req: Request, res: Response): Promise<void> => {
       bio: user.bio,
       followers: user.followers,
       following: user.following,
+      gender: user.gender,
       posts: populatedPost,
     };
 
