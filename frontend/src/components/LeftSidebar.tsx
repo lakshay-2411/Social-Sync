@@ -13,7 +13,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
-import { setAuthUser } from "@/redux/authSlice";
+import { setAuthUser, setSelectedUser } from "@/redux/authSlice";
 import { useState } from "react";
 import CreatePost from "./CreatePost";
 import { setPost, setSelectedPost } from "@/redux/postSlice";
@@ -32,6 +32,7 @@ const LeftSideBar = () => {
       if (res.data.success) {
         dispatch(setAuthUser(null));
         dispatch(setSelectedPost(null));
+        dispatch(setSelectedUser(null));
         dispatch(setPost([]));
         toast.success(res.data.message);
         navigate("/login");
@@ -55,6 +56,8 @@ const LeftSideBar = () => {
       navigate(`/profile/${user?._id}`);
     } else if (textType === "Home") {
       navigate("/");
+    } else if (textType === "Messages") {
+      navigate("/chat");
     }
   };
 

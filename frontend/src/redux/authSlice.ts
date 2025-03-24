@@ -5,12 +5,14 @@ interface AuthState {
   user: IUserFrontend | null;
   suggestedUsers: IUserFrontend[];
   userProfile: IUserFrontend | null;
+  selectedUser: IUserFrontend | null;
 }
 
 const initialState: AuthState = {
   user: null,
   suggestedUsers: [],
   userProfile: null,
+  selectedUser: null,
 };
 
 const authSlice = createSlice({
@@ -26,9 +28,16 @@ const authSlice = createSlice({
     setUserProfile: (state, action: PayloadAction<IUserFrontend | null>) => {
       state.userProfile = action.payload;
     },
+    setSelectedUser: (state, action: PayloadAction<IUserFrontend | null>) => {
+      state.selectedUser = action.payload;
+    },
   },
 });
 
-export const { setAuthUser, setSuggestedUsers, setUserProfile } =
-  authSlice.actions;
+export const {
+  setAuthUser,
+  setSuggestedUsers,
+  setUserProfile,
+  setSelectedUser,
+} = authSlice.actions;
 export default authSlice.reducer;
