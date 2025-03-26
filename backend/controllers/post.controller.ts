@@ -5,6 +5,7 @@ import Post from "../models/post.module.js";
 import User from "../models/user.module.js";
 import Comment from "../models/comment.module.js";
 import mongoose from "mongoose";
+import { getReceiverSocketId, io } from "../socket/socket.js";
 
 interface CustomRequest extends Request {
   file?: Express.Multer.File;
@@ -140,6 +141,24 @@ export const likePost = async (req: CustomRequest, res: Response) => {
     await post.save();
 
     // implement socket io for real time notification
+    const user = await User.findById(userLikingThePost).select(
+      "username profilePicture"
+    );
+    const postOwnerId = post.author.toString();
+    if (postOwnerId !== userLikingThePost) {
+      // send notification to the post owner
+      const notification = {
+        type: "like",
+        userId: userLikingThePost,
+        userDetails: user,
+        postId,
+        message: "Your post has been liked",
+      };
+      const postOwnerSocketId = getReceiverSocketId(postOwnerId);
+      if (postOwnerSocketId) {
+        io.to(postOwnerSocketId).emit("notification", notification);
+      }
+    }
 
     res.status(200).json({ message: "Post liked", success: true });
   } catch (error) {
@@ -164,6 +183,24 @@ export const unlikePost = async (req: CustomRequest, res: Response) => {
     await post.save();
 
     // implement socket io for real time notification
+    const user = await User.findById(userUnlikingThePost).select(
+      "username profilePicture"
+    );
+    const postOwnerId = post.author.toString();
+    if (postOwnerId !== userUnlikingThePost) {
+      // send notification to the post owner
+      const notification = {
+        type: "unlike",
+        userId: userUnlikingThePost,
+        userDetails: user,
+        postId,
+        message: "Your post has been unliked",
+      };
+      const postOwnerSocketId = getReceiverSocketId(postOwnerId);
+      if (postOwnerSocketId) {
+        io.to(postOwnerSocketId).emit("notification", notification);
+      }
+    }
 
     res.status(200).json({ message: "Post Disliked", success: true });
   } catch (error) {

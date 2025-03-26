@@ -25,7 +25,9 @@ const Profile = () => {
     setActiveTab(tab);
   };
 
-  return loading ? <SkeletonProfile /> : (
+  return loading ? (
+    <SkeletonProfile />
+  ) : (
     <div className="flex max-w-4xl justify-center mx-auto pl-10">
       <div className="flex flex-col gap-10 p-8">
         <div className="grid grid-cols-2">
@@ -89,19 +91,19 @@ const Profile = () => {
               <div className="flex items-center gap-6">
                 <p>
                   <span className="font-semibold">
-                    {userProfile?.posts.length}{" "}
+                    {userProfile?.posts?.length}
                   </span>
                   posts
                 </p>
                 <p>
                   <span className="font-semibold">
-                    {userProfile?.followers.length}{" "}
+                    {userProfile?.followers.length}
                   </span>
                   followers
                 </p>
                 <p>
                   <span className="font-semibold">
-                    {userProfile?.following.length}{" "}
+                    {userProfile?.following.length}
                   </span>
                   following
                 </p>
