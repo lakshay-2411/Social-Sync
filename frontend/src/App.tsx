@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "./redux/store";
 import { setSocket } from "./redux/socketSlice";
 import { setOnlineUsers } from "./redux/chatSlice";
+import { setNotifications } from "./redux/realTimeNotificationSlice";
 
 const browserRouter = createBrowserRouter([
   {
@@ -63,6 +64,10 @@ function App() {
       // listening all the events
       socketio.on("getOnlineUsers", (onlineUsers) => {
         dispatch(setOnlineUsers(onlineUsers));
+      });
+
+      socketio.on("notification", (notification) => {
+        dispatch(setNotifications(notification));
       });
 
       return () => {

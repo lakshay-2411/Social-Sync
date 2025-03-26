@@ -3,6 +3,7 @@ import authSlice from "./authSlice.ts";
 import postSlice from "./postSlice.ts";
 import socketSlice from "./socketSlice.ts";
 import chatSlice from "./chatSlice.ts";
+import realTimeNotificationSlice from "./realTimeNotificationSlice.ts";
 import {
   persistReducer,
   FLUSH,
@@ -25,6 +26,7 @@ const rootReducer = combineReducers({
   post: postSlice,
   socketio: socketSlice,
   chat: chatSlice,
+  realTimeNotification: realTimeNotificationSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
