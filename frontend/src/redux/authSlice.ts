@@ -19,7 +19,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setAuthUser: (state, action: PayloadAction<IUserFrontend | null>) => {
+    setAuthUser: (state, action) => {
       state.user = action.payload;
     },
     setSuggestedUsers: (state, action: PayloadAction<IUserFrontend[]>) => {

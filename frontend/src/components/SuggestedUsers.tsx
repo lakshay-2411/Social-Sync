@@ -1,10 +1,65 @@
 import { RootState } from "@/redux/store";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
+import { setAuthUser } from "@/redux/authSlice";
+import axios from "axios";
+import { Types } from "mongoose";
+import { useState } from "react";
 
 const SuggestedUsers = () => {
-  const { suggestedUsers } = useSelector((state: RootState) => state.auth);
+  const { suggestedUsers, user } = useSelector(
+    (state: RootState) => state.auth
+  );
+  const dispatch = useDispatch();
+
+  const [followingStatus, setFollowingStatus] = useState<{
+    [key: string]: boolean;
+  }>(
+    () =>
+      user?.following?.reduce((acc, id) => {
+        acc[id.toString()] = true;
+        return acc;
+      }, {} as { [key: string]: boolean }) || {}
+  );
+
+  const handleFollow = async (userId: Types.ObjectId) => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8000/api/v1/user/followorunfollow/${userId}`,
+        { withCredentials: true }
+      );
+      if (res.data.success) {
+        setFollowingStatus((prev) => ({
+          ...prev,
+          [userId.toString()]: !prev[userId.toString()],
+        }));
+        toast.success(res.data.message);
+        if (user) {
+          const updatedAuthUser = {
+            ...user,
+            following: res.data.message.includes("Followed")
+              ? [...user?.following, userId]
+              : user?.following.filter((id) => id !== userId),
+          };
+          dispatch(setAuthUser(updatedAuthUser));
+        }
+      } else {
+        setFollowingStatus((prev) => ({
+          ...prev,
+          [userId.toString()]: !prev[userId.toString()],
+        }));
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Something went wrong!");
+      }
+    }
+  };
+
   return (
     <div className="my-10">
       <div className="flex items-center gap-20 justify-between text-sm">
@@ -12,6 +67,7 @@ const SuggestedUsers = () => {
         <span className="font-medium cursor-pointer">See All</span>
       </div>
       {suggestedUsers.map((user) => {
+        const isFollowing = followingStatus[user?._id.toString()] || false;
         return (
           <div
             key={user._id.toString()}
@@ -33,8 +89,15 @@ const SuggestedUsers = () => {
                 </span>
               </div>
             </div>
-            <span className="text-[#3BADF8] text-xs font-bold cursor-pointer hover:text-[#3495d6]">
-              Follow
+            <span
+              onClick={() => handleFollow(user?._id)}
+              className={`text-xs font-bold cursor-pointer ${
+                isFollowing
+                  ? "text-red-500 hover:text-red-400"
+                  : "text-[#3BADF8] hover:text-[#3495d6]"
+              }`}
+            >
+              {isFollowing ? "Unfollow" : "Follow"}
             </span>
           </div>
         );

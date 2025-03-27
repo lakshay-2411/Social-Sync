@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { RootState } from "@/redux/store";
 import useGetUserProfile from "@/hooks/useGetUserProfile";
@@ -8,6 +8,9 @@ import { Badge } from "./ui/badge";
 import { AtSign, Heart, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import SkeletonProfile from "./SkeletonProfile";
+import axios from "axios";
+import { toast } from "sonner";
+import { setAuthUser } from "@/redux/authSlice";
 
 const Profile = () => {
   const params = useParams();
@@ -16,13 +19,43 @@ const Profile = () => {
   const { userProfile, user } = useSelector((state: RootState) => state.auth);
 
   const isLoggedInUserProfile = user?._id === userProfile?._id;
-  const isFollowing = false;
+  const isFollowing = user?.following?.some(
+    (id) => id.toString() === userProfile?._id.toString()
+  );
+  const dispatch = useDispatch();
 
   const postsToDisplay =
     activeTab === "POSTS" ? userProfile?.posts : userProfile?.savedPosts;
 
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
+  };
+
+  const handleFollow = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8000/api/v1/user/followorunfollow/${userProfile?._id}`,
+        { withCredentials: true }
+      );
+      if (res.data.success) {
+        toast.success(res.data.message);
+        if (user) {
+          const updatedAuthUser = {
+            ...user,
+            following: res.data.message.includes("Followed")
+              ? [...user?.following, userProfile?._id]
+              : user?.following.filter((id) => id !== userProfile?._id),
+          };
+          dispatch(setAuthUser(updatedAuthUser));
+        }
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Something went wrong!");
+      }
+    }
   };
 
   return loading ? (
@@ -70,6 +103,7 @@ const Profile = () => {
                 ) : isFollowing ? (
                   <>
                     <Button
+                      onClick={handleFollow}
                       variant={"secondary"}
                       className="cursor-pointer hover:bg-gray-300 h-8"
                     >
@@ -83,7 +117,10 @@ const Profile = () => {
                     </Button>
                   </>
                 ) : (
-                  <Button className="cursor-pointer bg-[#0095F6] hover:bg-[#0094f6cb] h-8">
+                  <Button
+                    onClick={handleFollow}
+                    className="cursor-pointer bg-[#0095F6] hover:bg-[#0094f6cb] h-8"
+                  >
                     Follow
                   </Button>
                 )}
@@ -91,19 +128,19 @@ const Profile = () => {
               <div className="flex items-center gap-6">
                 <p>
                   <span className="font-semibold">
-                    {userProfile?.posts?.length}
+                    {userProfile?.posts?.length}{" "}
                   </span>
                   posts
                 </p>
                 <p>
                   <span className="font-semibold">
-                    {userProfile?.followers.length}
+                    {userProfile?.followers.length}{" "}
                   </span>
                   followers
                 </p>
                 <p>
                   <span className="font-semibold">
-                    {userProfile?.following.length}
+                    {userProfile?.following.length}{" "}
                   </span>
                   following
                 </p>

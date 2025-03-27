@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import axios from "axios";
 import { setPost, setSelectedPost } from "@/redux/postSlice";
 import { Badge } from "./ui/badge";
+import { Link } from "react-router-dom";
 
 interface PostProps {
   post: IPostFrontend;
@@ -157,7 +158,9 @@ const Post: React.FC<PostProps> = ({ post }) => {
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div className="flex items-center gap-3">
-            <h1>{post.author?.username}</h1>
+            <Link to={`/profile/${post?.author?._id}`}>
+              <h1>{post.author?.username}</h1>
+            </Link>
             {user?._id === post?.author?._id && (
               <Badge variant={"secondary"}>Author</Badge>
             )}
@@ -227,7 +230,9 @@ const Post: React.FC<PostProps> = ({ post }) => {
       </div>
       <span className="font-medium text-sm block mb-2">{likeCount} likes</span>
       <p className="text-sm">
-        <span className="font-medium mr-2">{post.author?.username}</span>
+        <Link to={`/profile/${post?.author?._id}`}>
+          <span className="font-medium mr-2">{post.author?.username}</span>
+        </Link>
         {post.caption}
       </p>
       {comment.length > 0 && (
