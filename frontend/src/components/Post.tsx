@@ -150,7 +150,7 @@ const Post: React.FC<PostProps> = ({ post }) => {
   };
 
   return (
-    <div className="my-8 w-full max-w-sm mx-auto">
+    <div className="my-8 w-full max-w-sm mx-auto md:w-[calc(100%-30%)] lg:max-w-4xl xl:max-w-xl 2xl:max-w-2xl">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Avatar>

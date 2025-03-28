@@ -61,11 +61,11 @@ const Profile = () => {
   return loading ? (
     <SkeletonProfile />
   ) : (
-    <div className="flex max-w-4xl justify-center mx-auto pl-10">
-      <div className="flex flex-col gap-10 p-8">
-        <div className="grid grid-cols-2">
+    <div className="w-full px-4 sm:px-6 md:px-8 lg:max-w-4xl lg:mx-auto pt-16 md:pt-0">
+      <div className="flex flex-col gap-6 md:gap-10 p-4 md:p-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <section className="flex items-center justify-center">
-            <Avatar className="w-32 h-34">
+            <Avatar className="w-32 h-34 md:w-40 md:h-40 lg:w-44 lg:h-44">
               <AvatarImage
                 src={userProfile?.profilePicture}
                 alt="profilePicture"
@@ -74,58 +74,60 @@ const Profile = () => {
             </Avatar>
           </section>
           <section>
-            <div className="flex flex-col gap-5">
-              <div className="flex items-center gap-4">
-                <span>{userProfile?.username}</span>
+            <div className="flex flex-col gap-4 md:gap-5">
+              <div className="flex flex-wrap items-center gap-2 md:gap-4">
+                <span className="text-base md:text-lg font-semibold">
+                  {userProfile?.username}
+                </span>
                 {isLoggedInUserProfile ? (
-                  <>
+                  <div className="flex flex-wrap gap-2">
                     <Link to="/account/edit">
                       <Button
                         variant={"secondary"}
-                        className="cursor-pointer hover:bg-gray-200 h-8"
+                        className="cursor-pointer hover:bg-gray-200 h-8 text-xs md:text-sm"
                       >
                         Edit Profile
                       </Button>
                     </Link>
                     <Button
                       variant={"secondary"}
-                      className="cursor-pointer hover:bg-gray-200 h-8"
+                      className="cursor-pointer hover:bg-gray-200 h-8 text-xs md:text-sm"
                     >
                       View Archive
                     </Button>
                     <Button
                       variant={"secondary"}
-                      className="cursor-pointer hover:bg-gray-200 h-8"
+                      className="cursor-pointer hover:bg-gray-200 h-8 text-xs md:text-sm"
                     >
                       Add Tools
                     </Button>
-                  </>
+                  </div>
                 ) : isFollowing ? (
-                  <>
+                  <div className="flex flex-wrap gap-2">
                     <Button
                       onClick={handleFollow}
                       variant={"secondary"}
-                      className="cursor-pointer hover:bg-gray-300 h-8"
+                      className="cursor-pointer hover:bg-gray-300 h-8 text-xs md:text-sm"
                     >
                       Unfollow
                     </Button>
                     <Button
                       variant={"secondary"}
-                      className="cursor-pointer hover:bg-gray-300 h-8"
+                      className="cursor-pointer hover:bg-gray-300 h-8 text-xs md:text-sm"
                     >
                       Message
                     </Button>
-                  </>
+                  </div>
                 ) : (
                   <Button
                     onClick={handleFollow}
-                    className="cursor-pointer bg-[#0095F6] hover:bg-[#0094f6cb] h-8"
+                    className="cursor-pointer bg-[#0095F6] hover:bg-[#0094f6cb] h-8  text-xs md:text-sm"
                   >
                     Follow
                   </Button>
                 )}
               </div>
-              <div className="flex items-center gap-6">
+              <div className="flex flex-wrap items-center gap-3 md:gap-6">
                 <p>
                   <span className="font-semibold">
                     {userProfile?.posts?.length}{" "}
@@ -145,12 +147,12 @@ const Profile = () => {
                   following
                 </p>
               </div>
-              <div className="flex flex-col gap-1 text-[14px]">
+              <div className="flex flex-col gap-1 text-xs md:text-sm">
                 <span className="font-semibold">
                   {userProfile?.bio || "Bio here..."}
                 </span>
                 <Badge variant={"secondary"} className="w-fit">
-                  <AtSign />
+                  <AtSign className="w-4 h-4" />
                   <span>{userProfile?.username}</span>
                 </Badge>
                 <span>Learn code with Lakshay!😎</span>
@@ -161,7 +163,7 @@ const Profile = () => {
           </section>
         </div>
         <div className="border-t border-t-gray-300">
-          <div className="flex items-center justify-center gap-10 text-sm">
+          <div className="flex items-center justify-center gap-4 md:gap-10 text-xs md:text-sm">
             <span
               onClick={() => handleTabChange("POSTS")}
               className={`py-3 cursor-pointer ${
@@ -195,7 +197,7 @@ const Profile = () => {
               TAGS
             </span>
           </div>
-          <div className="grid grid-cols-3 gap-1">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1">
             {postsToDisplay?.map((post) => {
               if (typeof post === "object" && "image" in post) {
                 return (
