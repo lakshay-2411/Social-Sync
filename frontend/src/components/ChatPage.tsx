@@ -9,6 +9,7 @@ import Messages from "./Messages";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { setMessages } from "@/redux/chatSlice";
+import useTypingIndicator from "@/hooks/useTypingIndicator";
 
 const ChatPage = () => {
   const { user, suggestedUsers, selectedUser } = useSelector(
@@ -17,6 +18,13 @@ const ChatPage = () => {
   const [message, setMessage] = useState("");
   const { onlineUsers, messages } = useSelector((state: any) => state.chat);
   const dispatch = useDispatch();
+  const { sendTypingStatus } = useTypingIndicator();
+  const [typingTimeout, setTypingTimeout] = useState<NodeJS.Timeout | null>(
+    null
+  );
+  const { typingUsers } = useTypingIndicator();
+  const isTyping =
+    selectedUser && typingUsers.includes(selectedUser?._id.toString());
 
   const sendMessageHandler = async (receiverId: string) => {
     try {
@@ -33,14 +41,34 @@ const ChatPage = () => {
       if (res.data.success) {
         dispatch(setMessages([...messages, res.data.newMessage]));
         setMessage("");
+        sendTypingStatus(false);
       }
     } catch (error) {
       console.log(error);
     }
   };
 
+  const handleMessageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = e.target.value;
+    setMessage(inputValue);
+    if (typingTimeout) {
+      clearTimeout(typingTimeout);
+    }
+
+    sendTypingStatus(inputValue.length > 0);
+    // Set a timeout to stop typing after 3 seconds of inactivity
+    const timeout = setTimeout(() => {
+      sendTypingStatus(false);
+    }, 3000);
+
+    setTypingTimeout(timeout);
+  };
+
   useEffect(() => {
     return () => {
+      if (typingTimeout) {
+        clearTimeout(typingTimeout);
+      }
       dispatch(setSelectedUser(null));
     };
   }, []);
@@ -53,8 +81,12 @@ const ChatPage = () => {
         <div className="overflow-y-auto h-[80vh]">
           {suggestedUsers.map((suggestedUser) => {
             const isOnline = onlineUsers.includes(suggestedUser?._id);
+            const isUserTyping = typingUsers.includes(
+              suggestedUser?._id.toString()
+            );
             return (
               <div
+                key={suggestedUser?._id.toString()}
                 onClick={() => dispatch(setSelectedUser(suggestedUser))}
                 className="flex items-center gap-3 p-3 hover:bg-gray-100 cursor-pointer"
               >
@@ -69,10 +101,18 @@ const ChatPage = () => {
                   <span className="font-medium">{suggestedUser?.username}</span>
                   <span
                     className={`text-xs font-bold ${
-                      isOnline ? "text-green-600" : "text-red-600"
+                      isUserTyping
+                        ? "text-blue-500 animate-pulse"
+                        : isOnline
+                        ? "text-green-600"
+                        : "text-red-600"
                     }`}
                   >
-                    {isOnline ? "Online" : "Offline"}
+                    {isUserTyping
+                      ? "Typing..."
+                      : isOnline
+                      ? "Online"
+                      : "Offline"}
                   </span>
                 </div>
               </div>
@@ -92,6 +132,11 @@ const ChatPage = () => {
             </Avatar>
             <div className="flex flex-col">
               <span>{selectedUser?.username}</span>
+              {isTyping && (
+                <span className="text-sm text-blue-500 animate-pulse">
+                  Typing...
+                </span>
+              )}
             </div>
           </div>
           <Messages />
@@ -99,7 +144,8 @@ const ChatPage = () => {
             <Input
               type="text"
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={handleMessageChange}
+              onBlur={() => sendTypingStatus(false)}
               className="flex-1 mr-2 focus-visible:ring-transparent"
               placeholder="Type a message"
             />

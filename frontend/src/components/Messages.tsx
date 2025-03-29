@@ -5,6 +5,8 @@ import { Button } from "./ui/button";
 import { Link } from "react-router-dom";
 import useGetAllMessage from "@/hooks/useGetAllMessage";
 import useGetRealTimeMessage from "@/hooks/useGetRealTimeMessage";
+import useTypingIndicator from "@/hooks/useTypingIndicator";
+import { useEffect, useRef } from "react";
 
 const Messages = () => {
   useGetRealTimeMessage();
@@ -12,8 +14,24 @@ const Messages = () => {
   const { selectedUser } = useSelector((state: RootState) => state.auth);
   const { messages } = useSelector((state: RootState) => state.chat);
   const { user } = useSelector((state: RootState) => state.auth);
+  const { typingUsers } = useTypingIndicator();
+
+  const messageEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  useEffect(() => {
+    if (
+      selectedUser?._id &&
+      typingUsers.includes(selectedUser._id.toString())
+    ) {
+      messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [typingUsers, selectedUser]);
   return (
-    <div className="overflow-y-auto flex-1 p-4">
+    <div className="overflow-y-auto flex-1 p-4 relative">
       <div className="flex justify-center">
         <div className="flex flex-col items-center justify-center">
           <Avatar className="h-20 w-20">
@@ -53,6 +71,17 @@ const Messages = () => {
               </div>
             );
           })}
+
+        {selectedUser?._id &&
+          typingUsers.includes(selectedUser._id.toString()) && (
+            <div
+              ref={messageEndRef}
+              className="relative p-4 text-sm text-gray-500 animate-pulse"
+            >
+              {selectedUser?.username} is typing...
+            </div>
+          )}
+        <div ref={messageEndRef} />
       </div>
     </div>
   );
