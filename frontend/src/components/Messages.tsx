@@ -56,12 +56,14 @@ const Messages = () => {
               <div
                 key={msg?._id.toString()}
                 className={`flex ${
-                  msg?.senderId === user?._id ? "justify-end" : "justify-start"
+                  msg?.senderId.toString() === user?._id
+                    ? "justify-end"
+                    : "justify-start"
                 }`}
               >
                 <div
                   className={`p-2 rounded-lg max-w-xs break-words ${
-                    msg?.senderId === user?._id
+                    msg?.senderId.toString() === user?._id
                       ? "bg-blue-500 text-white"
                       : "bg-gray-200 text-black"
                   }`}

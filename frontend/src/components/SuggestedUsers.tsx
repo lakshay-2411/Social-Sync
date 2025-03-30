@@ -41,7 +41,7 @@ const SuggestedUsers = () => {
             ...user,
             following: res.data.message.includes("Followed")
               ? [...user?.following, userId]
-              : user?.following.filter((id) => id !== userId),
+              : user?.following.filter((id) => id !== userId.toString()),
           };
           dispatch(setAuthUser(updatedAuthUser));
         }
@@ -90,7 +90,7 @@ const SuggestedUsers = () => {
               </div>
             </div>
             <span
-              onClick={() => handleFollow(user?._id)}
+              onClick={() => handleFollow(new Types.ObjectId(user?._id))}
               className={`text-xs font-bold cursor-pointer ${
                 isFollowing
                   ? "text-red-500 hover:text-red-400"
