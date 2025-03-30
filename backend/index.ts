@@ -21,7 +21,7 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: ["http://localhost:5173", "https://socialsync-v1ds.onrender.com"],
   credentials: true,
 };
 
