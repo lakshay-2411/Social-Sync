@@ -93,7 +93,8 @@ export const Login = async (req: Request, res: Response): Promise<void> => {
     res
       .cookie("token", token, {
         httpOnly: true,
-        sameSite: "strict",
+        sameSite: "none",
+        secure: true,
         maxAge: 1 * 24 * 60 * 60 * 1000,
       })
       .json({
