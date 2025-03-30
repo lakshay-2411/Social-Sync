@@ -13,7 +13,7 @@ const useGetUserProfile = (userId: string) => {
         setLoading(true);
         dispatch(setUserProfile(null));
         const res = await axios.get(
-          `http://localhost:8000/api/v1/user/${userId}/profile`,
+          `${import.meta.env.VITE_API_URL}/user/${userId}/profile`,
           {
             withCredentials: true,
           }

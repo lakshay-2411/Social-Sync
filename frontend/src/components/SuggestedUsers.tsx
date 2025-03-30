@@ -27,7 +27,7 @@ const SuggestedUsers = () => {
   const handleFollow = async (userId: Types.ObjectId) => {
     try {
       const res = await axios.get(
-        `http://localhost:8000/api/v1/user/followorunfollow/${userId}`,
+        `${import.meta.env.VITE_API_URL}/user/followorunfollow/${userId}`,
         { withCredentials: true }
       );
       if (res.data.success) {

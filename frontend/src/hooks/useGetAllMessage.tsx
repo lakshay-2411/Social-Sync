@@ -11,7 +11,9 @@ const useGetAllMessage = () => {
     const fetchAllMessage = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8000/api/v1/message/all/${selectedUser?._id.toString()}`,
+          `${
+            import.meta.env.VITE_API_URL
+          }/message/all/${selectedUser?._id.toString()}`,
           {
             withCredentials: true,
           }

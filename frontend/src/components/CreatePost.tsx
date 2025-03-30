@@ -43,7 +43,7 @@ const CreatePost: React.FC<{
     try {
       setLoading(true);
       const res = await axios.post(
-        "http://localhost:8000/api/v1/post/addpost",
+        `${import.meta.env.VITE_API_URL}/post/addpost`,
         formData,
         {
           headers: {

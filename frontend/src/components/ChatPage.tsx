@@ -29,7 +29,7 @@ const ChatPage = () => {
   const sendMessageHandler = async (receiverId: string) => {
     try {
       const res = await axios.post(
-        `http://localhost:8000/api/v1/message/send/${receiverId}`,
+        `${import.meta.env.VITE_API_URL}/message/send/${receiverId}`,
         { message },
         {
           headers: {

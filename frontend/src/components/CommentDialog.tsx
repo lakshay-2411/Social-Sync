@@ -40,7 +40,7 @@ const CommentDialog: React.FC<{
   const postCommentHandler = async () => {
     try {
       const res = await axios.post(
-        `http://localhost:8000/api/v1/post/${selectedPost?._id}/comment`,
+        `${import.meta.env.VITE_API_URL}/post/${selectedPost?._id}/comment`,
         { text },
         {
           headers: {
