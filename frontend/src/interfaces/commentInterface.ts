@@ -1,8 +1,12 @@
-import IComment from "../../../backend/interfaces/commentInterface";
-import IUser from "../../../backend/interfaces/userInterface";
+import IUserFrontend from "./userInterface";
 
-interface IcommentFrontend extends Omit<IComment, "author"> {
-  author: IUser;
+interface IcommentFrontend {
+  _id: string;
+  text: string;
+  author: IUserFrontend;
+  post: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export default IcommentFrontend;

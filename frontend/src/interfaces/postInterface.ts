@@ -1,11 +1,15 @@
-import IPost from "../../../backend/interfaces/postInterface";
-import IUser from "../../../backend/interfaces/userInterface";
 import IcommentFrontend from "./commentInterface";
+import IUserFrontend from "./userInterface";
 
-interface IPostFrontend extends Omit<IPost, "author" | "likes" | "comments"> {
-  author: IUser;
+interface IPostFrontend {
+  _id: string;
+  caption?: string;
+  image: string;
+  author: IUserFrontend;
   likes: string[];
   comments: IcommentFrontend[];
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export default IPostFrontend;
