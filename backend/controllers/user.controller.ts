@@ -29,10 +29,45 @@ export const Register = async (req: Request, res: Response): Promise<void> => {
     }
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await User.create({ username, email, password: hashedPassword });
+    const newUser = await User.create({
+      username,
+      email,
+      password: hashedPassword,
+    });
+    if (!process.env.SECRET_KEY) {
+      res.status(500).json({
+        message: "Server error: Secret key not found",
+        success: false,
+      });
+      return;
+    }
+    const token = jwt.sign({ userId: newUser._id }, process.env.SECRET_KEY, {
+      expiresIn: "1d",
+    });
+    const userData = {
+      _id: newUser._id,
+      username: newUser.username,
+      email: newUser.email,
+      profilePicture: newUser.profilePicture,
+      bio: newUser.bio,
+      followers: newUser.followers,
+      following: newUser.following,
+      gender: newUser.gender,
+      posts: [],
+    };
     res
+      .cookie("token", token, {
+        httpOnly: true,
+        sameSite: "none",
+        secure: true,
+        maxAge: 1 * 24 * 60 * 60 * 1000,
+      })
       .status(201)
-      .json({ message: "Account created successfully", success: true });
+      .json({
+        message: `Welcome ${newUser.username}`,
+        success: true,
+        user: userData,
+      });
   } catch (error) {
     console.log(error);
     res.status(500).json({ message: "Internal server error", success: false });

@@ -7,7 +7,8 @@ import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { RootState } from "@/redux/store";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setAuthUser } from "@/redux/authSlice";
 
 const Signup = () => {
   const [input, setInput] = useState({
@@ -17,6 +18,7 @@ const Signup = () => {
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const { user } = useSelector((state: RootState) => state.auth);
 
@@ -39,7 +41,8 @@ const Signup = () => {
         }
       );
       if (res.data.success) {
-        navigate("/login");
+        dispatch(setAuthUser(res.data.user));
+        navigate("/");
         toast.success(res.data.message);
         setInput({
           username: "",
