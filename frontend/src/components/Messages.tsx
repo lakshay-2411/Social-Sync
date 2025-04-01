@@ -7,12 +7,15 @@ import useGetAllMessage from "@/hooks/useGetAllMessage";
 import useGetRealTimeMessage from "@/hooks/useGetRealTimeMessage";
 import useTypingIndicator from "@/hooks/useTypingIndicator";
 import { useEffect, useRef } from "react";
+import MessageSkeleton from "./MessageSkeleton";
 
 const Messages = () => {
   useGetRealTimeMessage();
   useGetAllMessage();
   const { selectedUser } = useSelector((state: RootState) => state.auth);
-  const { messages } = useSelector((state: RootState) => state.chat);
+  const { messages, loadingMessages } = useSelector(
+    (state: RootState) => state.chat
+  );
   const { user } = useSelector((state: RootState) => state.auth);
   const { typingUsers } = useTypingIndicator();
 
@@ -50,7 +53,10 @@ const Messages = () => {
         </div>
       </div>
       <div className="flex flex-col gap-3">
-        {messages &&
+        {loadingMessages ? (
+          <MessageSkeleton />
+        ) : (
+          messages &&
           messages.map((msg) => {
             return (
               <div
@@ -72,7 +78,8 @@ const Messages = () => {
                 </div>
               </div>
             );
-          })}
+          })
+        )}
 
         {selectedUser?._id &&
           typingUsers.includes(selectedUser._id.toString()) && (

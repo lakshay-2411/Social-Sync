@@ -4,11 +4,13 @@ import IMessage from "../../../backend/interfaces/messageInterface";
 interface chatState {
   onlineUsers: any;
   messages: IMessage[];
+  loadingMessages: boolean;
 }
 
 const initialState: chatState = {
   onlineUsers: null,
   messages: [],
+  loadingMessages: false,
 };
 
 const chatSlice = createSlice({
@@ -20,9 +22,14 @@ const chatSlice = createSlice({
     },
     setMessages: (state, action) => {
       state.messages = action.payload;
+      state.loadingMessages = false;
+    },
+    setLoadingMessages: (state, action) => {
+      state.loadingMessages = action.payload;
     },
   },
 });
 
-export const { setOnlineUsers, setMessages } = chatSlice.actions;
+export const { setOnlineUsers, setMessages, setLoadingMessages } =
+  chatSlice.actions;
 export default chatSlice.reducer;

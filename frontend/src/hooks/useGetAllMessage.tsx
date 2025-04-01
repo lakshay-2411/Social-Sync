@@ -1,4 +1,4 @@
-import { setMessages } from "@/redux/chatSlice";
+import { setMessages, setLoadingMessages } from "@/redux/chatSlice";
 import { RootState } from "@/redux/store";
 import axios from "axios";
 import { useEffect } from "react";
@@ -9,6 +9,8 @@ const useGetAllMessage = () => {
   const { selectedUser } = useSelector((state: RootState) => state.auth);
   useEffect(() => {
     const fetchAllMessage = async () => {
+      if (!selectedUser) return;
+      dispatch(setLoadingMessages(true));
       try {
         const res = await axios.get(
           `${
@@ -23,6 +25,8 @@ const useGetAllMessage = () => {
         }
       } catch (error) {
         console.log(error);
+      } finally {
+        dispatch(setLoadingMessages(false));
       }
     };
     fetchAllMessage();
